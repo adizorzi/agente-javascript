@@ -11,13 +11,17 @@
   crossorigin="anonymous"></script>
 	<script>
 	var cols = 6
-	var posicaoAgente = [1, 1];
+	var posicaoAgente = [0,0];
 	function labirinto(cols){
 		var labirinto = ''
 		for (var i = 0; i < cols; i++) {
 				labirinto += '<div data-position='+i+' class="linhas'+i+'">'
 			for (var j = 0; j < cols; j++) {
-				labirinto += '<span data-position='+j+' class="colunas sujo colunas'+j+'">| S |</span>';
+				var rand = 0;
+				rand = Math.floor(Math.random() * 2)
+				var nun = rand == 0 ? 'S' : 'L';
+				var sujo = rand == 0 ? 'sujo' : '';
+				labirinto += '<span data-position='+j+' class="colunas '+sujo+' colunas'+j+'">| '+nun+' |</span>';
 			}
 				labirinto += '</div>'
 			labirinto += '<br />';
@@ -36,34 +40,71 @@
 		var menosLinha = parseInt($(agente).parent().data('position')) - 1;
 		var maisColuna = parseInt(position) + 1;
 		var maisLinha =  parseInt($(agente).parent().data('position')) + 1;
+		var maisMais = parseInt($(agente).parent().data('position')) + 2;
+		var menosMenos = parseInt($(agente).parent().data('position')) - 2;
+		var direita = $(agente).siblings('.colunas'+maisColuna);
+		var baixo = $(agente).parent().siblings('.linhas'+maisLinha).find('.colunas'+ position);
+		var esquerda = $(agente).siblings('.colunas'+menosColuna);
+		var cima = $(agente).parent().siblings('.linhas'+menosLinha).find('.colunas'+ position);
+		var maisCima = $(agente).parent().siblings('.linhas'+maisMais).find('.colunas'+ position);
+		var maisBaixo = $(agente).parent().siblings('.linhas'+menosMenos).find('.colunas'+ position);
+		var primairaColuna = $(agente).siblings('.colunas0');
 
-		if($(agente).siblings('.colunas'+maisColuna).html() != 'undefined' && $(agente).siblings('.colunas'+maisColuna).html() == '| S |') {
+		if($(direita).html() != 'undefined' && $(direita).html() == '| S |') {
+			
 			$(agente).html('| L |').removeClass('sujo agente');
 			var thad = $(agente).siblings('.colunas'+maisColuna);
 			$(thad).html('| A |').addClass('agente');
-		}else if($(agente).parent().siblings('.linhas'+maisLinha).find('.colunas'+ position).html() != 'undefined' && $(agente).parent().siblings('.linhas'+maisLinha).find('.colunas'+ position).html() == '| S |'){
+
+		}else if($(baixo).html() != 'undefined' && $(baixo).html() == '| S |'){
+
 			$(agente).html('| L |').removeClass('sujo agente');
 			var thad = $(agente).parent().siblings('.linhas'+maisLinha).find('.colunas'+ position);
 			$(thad).html('| A |').addClass('agente');	
-		}else if($(agente).siblings('.colunas'+menosColuna).html() != 'undefined' && $(agente).siblings('.colunas'+menosColuna).html() == '| S |'){
+
+		}else if($(esquerda).html() != 'undefined' && $(esquerda).html() == '| S |'){
+			
 			$(agente).html('| L |').removeClass('sujo agente');
 			var thad = $(agente).siblings('.colunas'+menosColuna);
 			$(thad).html('| A |').addClass('agente');
-		}else if($(agente).parent().siblings('.linhas'+menosLinha).find('.colunas'+ position).html() != 'undefined' && $(agente).parent().siblings('.linhas'+menosLinha).find('.colunas'+ position).html() == '| S |'){
+
+		}else if($(cima).html() != 'undefined' && $(cima).html() == '| S |'){
+
 			$(agente).html('| L |').removeClass('sujo agente')
 			var thad = $(agente).parent().siblings('.linhas'+menosLinha).find('.colunas'+ position);
 			$(thad).html('| A |').addClass('agente');
-		}else{
-			console.log($('.labirinto').find('.sujo'));
-		}
 
+		}else if($(maisCima).html() != 'undefined' && $(maisCima).html() == '| S |'){
+			$(agente).html('| L |').removeClass('sujo agente')
+			var thad = $(agente).parent().siblings('.linhas'+maisMais).find('.colunas'+ position)
+			$(thad).html('| A |').addClass('agente');
+
+		}else if($(maisBaixo).html() != 'undefined' && $(maisBaixo).html() == '| S |') {
+
+			$(agente).html('| L |').removeClass('sujo agente')
+			var thad = $(agente).parent().siblings('.linhas'+menosMenos).find('.colunas'+ position)
+			$(thad).html('| A |').addClass('agente');
+
+		}else if($(primairaColuna).html() != 'undefined' && $(primairaColuna).html() == '| S |') {
+
+			$(agente).html('| L |').removeClass('sujo agente')
+			var thad = $(agente).siblings('.colunas0')
+			$(thad).html('| A |').addClass('agente');
+
+		}else {
+			var s = $('.labirinto').find('.sujo')
+			if(typeof $(s[0]).html() !== 'undefined') {
+				$(agente).html('| L |').removeClass('sujo agente')
+				$(s[0]).html('| A |').addClass('agente');
+			}else{
+				clearInterval(refreshInterval)
+			}
+		}
 	}
 	$(document).ready(function(){
 		labirinto(cols);
-			agente(posicaoAgente);
-		setInterval(function(){
-	    movimentoAgente();
-	    }, 1000);
+		agente(posicaoAgente);
+		refreshInterval = setInterval(movimentoAgente, 500);
 	})
 	</script>
 </body>
